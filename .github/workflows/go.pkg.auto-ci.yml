@@ -1,0 +1,16 @@
+name: Run Go Tests
+on:
+  push:
+    branches:
+      - 'features/**'
+      - 'dependabot/**'
+  pull_request:
+    branches:
+      - 'features/**'
+      - 'dependabot/**'
+
+jobs:
+  go-test:
+    uses:  tommzn/github-ci/.github/workflows/go.test.v2.yml@v1.0.101
+    with:
+      work-directory: './core'
