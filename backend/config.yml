@@ -1,0 +1,79 @@
+log:
+  loglevel: error
+  shipper: logzio
+
+tick_duration: 2s
+universe_seed:
+  number_of_planets:
+    min: 5
+    max: 20
+  resources:
+    - resource: Iron
+      min: 100
+      max: 5000
+    - resource: Food
+      min: 300
+      max: 3000
+    - resource: Fuel
+      min: 200
+      max: 2000
+  building_chance:
+    - building_type: City
+      chance: 0.2
+    - building_type: Mine
+      chance: 0.8
+    - building_type: Farm
+      chance: 0.7
+    - building_type: Refinery
+      chance: 0.5
+  build_costs:
+    - building_type: City
+      resources:
+        - resource: Iron
+          amount: 100
+        - resource: Food
+          amount: 50
+        - resource: Fuel
+          amount: 20
+    - building_type: Mine
+      resources:
+        - resource: Iron
+          amount: 50
+        - resource: Food
+          amount: 20
+    - building_type: Farm
+      resources:
+        - resource: Iron
+          amount: 30
+        - resource: Food
+          amount: 10
+    - building_type: Refinery
+      resources:
+        - resource: Iron
+          amount: 70
+        - resource: Food
+          amount: 30
+  production:
+    min: 3
+    max: 20
+  npc:
+    number_of_npcs:
+      min: 3
+      max: 10
+    credits:
+      min: 200
+      max: 50000
+    max_cargo:
+      min: 50
+      max: 600
+    offers:
+      - resource: Iron
+        min: 5
+        max: 20
+      - resource: Food
+        min: 5
+        max: 15
+      - resource: Fuel
+        min: 10
+        max: 25
+    colonization_cooldown_seconds: 3600 # 1 hour

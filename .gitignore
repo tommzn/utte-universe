@@ -1,0 +1,3 @@
+/backend/backend
+/k8s/generate_ghcr_secret.local.sh
+/k8s/secrets.local.yml
