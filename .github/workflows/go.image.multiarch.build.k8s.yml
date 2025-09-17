@@ -4,6 +4,10 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   go-multi-arch-image-build:
     uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.v2.yml@v1.0.102
