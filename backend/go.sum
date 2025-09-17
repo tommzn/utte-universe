@@ -84,6 +84,8 @@ github.com/tommzn/go-secrets v1.1.4 h1:TZy0VIfLnLad4jMPD6TfY8r8y8HVWH6mm2MIa8dyT
 github.com/tommzn/go-secrets v1.1.4/go.mod h1:SV2kl1YMLQU5HHFzq6M897id0SxJm5XijkNHMooHIFo=
 github.com/tommzn/go-utils v1.0.6 h1:wNT+AkTqRB+z+teCx328LcAXk/EN8R8j819x1452PWg=
 github.com/tommzn/go-utils v1.0.6/go.mod h1:8TYiDPF7MzHZSw2KY7lDV+ZDOR8S2k/9+kLkX7geUv4=
+github.com/tommzn/utte-universe/core v0.0.1 h1:Mdy3153lb5vhYn321D5zuJbu756SlVqwYZO765NQbq4=
+github.com/tommzn/utte-universe/core v0.0.1/go.mod h1:5U+jXLnkEJ+qIRqGlrC8Csw/C9D0OloRP5Y3Rqj/MTM=
 golang.org/x/sys v0.35.0 h1:vz1N37gP5bs89s7He8XuIYXpyY0+QlsKmzipCbUtyxI=
 golang.org/x/sys v0.35.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=
 golang.org/x/text v0.28.0 h1:rhazDwis8INMIwQ4tpjLDzUhx6RlXqZNPEM0huQojng=
