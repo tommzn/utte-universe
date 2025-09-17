@@ -1,0 +1,46 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: de-tommzn-utte-universe
+  namespace: utte
+  labels:
+    app: de-tommzn-utte-universe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: de-tommzn-utte-universe
+  template:
+    metadata:
+      labels:
+        app: de-tommzn-utte-universe
+    spec:
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: de-tommzn-secrets-utte
+      containers:
+        - name: de-tommzn-utte-universe
+          image: ghcr.io/tommzn/utte-universe:v0.0.4
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /run/secrets/token
+              readOnly: true
+          imagePullPolicy: Always
+          env:
+            - name: TSL_K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: TSL_K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: GO_CONFIG_S3_BUCKET
+              value: tsl.app.config
+            - name: GO_CONFIG_S3_KEY
+              value: prod/k8s/utte-universe/config.yml
+            - name: AWS_REGION
+              value: eu-central-1
+      imagePullSecrets:
+        - name: ghcr-credentials
