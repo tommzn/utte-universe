@@ -11,8 +11,8 @@ import (
 
 func bootstrap() (config.Config, secrets.SecretsManager, log.Logger, context.Context) {
 
-	conf := loadConfig()
 	secretsManager := newSecretsManager()
+	conf := loadConfig()
 	ctx := context.Background()
 	logger := newLogger(conf, secretsManager, ctx)
 	return conf, secretsManager, logger, ctx
