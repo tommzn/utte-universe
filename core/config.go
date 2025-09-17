@@ -145,8 +145,7 @@ func DefaultNPCSeedConfig() NPCSeedConfig {
 	}
 }
 
-func (c *Config) README.md file for this project
-(conf config.Config) error {
+func (c *Config) LoadFrom(conf config.Config) error {
 
 	rawConfig := RawConfig{}
 	if err := conf.Unmarshal(&rawConfig); err != nil {

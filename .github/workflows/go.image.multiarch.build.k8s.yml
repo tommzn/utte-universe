@@ -1,0 +1,13 @@
+name: Go Multi Arch Image Build
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  go-multi-arch-image-build:
+    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.v2.yml@v1.0.102
+    secrets:
+      cr-pat: ${{ secrets.CR_PAT }}
+    with:
+      work-directory: './backend'
