@@ -10,8 +10,6 @@ permissions:
 
 jobs:
   go-multi-arch-image-build:
-    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.v2.yml@v1.0.102
-    secrets:
-      cr-pat: ${{ secrets.CR_PAT }}
+    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.v2.yml@v1.0.103
     with:
       work-directory: './backend'
