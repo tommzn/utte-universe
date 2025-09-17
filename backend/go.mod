@@ -2,13 +2,11 @@ module github.com/tommzn/utte-universe/backend
 
 go 1.24.6
 
-replace github.com/tommzn/utte-universe/core => ../core
-
 require (
 	github.com/tommzn/go-config v1.3.0
 	github.com/tommzn/go-log v1.2.5
 	github.com/tommzn/go-secrets v1.1.4
-	github.com/tommzn/utte-universe/core v0.0.0-00010101000000-000000000000
+	github.com/tommzn/utte-universe/core v0.0.1
 )
 
 require (
