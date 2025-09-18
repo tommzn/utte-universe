@@ -109,23 +109,21 @@ func ResourceTypeFromString(s string) ResourceType {
 }
 
 type Planet struct {
-	Name      string
-	Type      PlanetType
-	Resources map[ResourceType]int
-	Modifiers map[ResourceType]float64
-	Buildings []*Building
-	Owner     *NPC
+	Name      string                   `json:"name"`
+	Type      PlanetType               `json:"type"`
+	Resources map[ResourceType]int     `json:"resources"`
+	Modifiers map[ResourceType]float64 `json:"modifiers"`
+	Buildings []*Building              `json:"buildings"`
+	Owner     *NPC                     `json:"owner"`
 }
 
 type NPC struct {
-	Name  string
-	Offer map[ResourceType]int // prices per resource type
-
-	Credits  int                  // available money
-	Cargo    map[ResourceType]int // current inventory
-	MaxCargo int                  // cargo capacity
-
-	ColonizationCooldown time.Time // when NPC can colonize again
+	Name                 string               `json:"name"`
+	Offer                map[ResourceType]int `json:"offer"`
+	Credits              int                  `json:"credits"`
+	Cargo                map[ResourceType]int `json:"cargo"`
+	MaxCargo             int                  `json:"maxCargo"`
+	ColonizationCooldown time.Time            `json:"colonizationCooldown"`
 }
 
 type TradeAction struct {

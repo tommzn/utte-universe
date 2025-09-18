@@ -21,7 +21,7 @@ spec:
             secretName: de-tommzn-secrets-utte
       containers:
         - name: de-tommzn-utte-universe
-          image: ghcr.io/tommzn/utte-universe:v0.0.4
+          image: ghcr.io/tommzn/utte-universe:v0.0.5
           volumeMounts:
             - name: secret-volume
               mountPath: /run/secrets/token
@@ -42,5 +42,31 @@ spec:
               value: prod/k8s/utte-universe/config.yml
             - name: AWS_REGION
               value: eu-central-1
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              httpHeaders:
+                - name: Accept
+                  value: application/json
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+            # expects status code 204
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              httpHeaders:
+                - name: Accept
+                  value: application/json
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+            # expects status code 204
       imagePullSecrets:
         - name: ghcr-credentials
