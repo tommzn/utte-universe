@@ -36,11 +36,13 @@ func (s *UniverseServer) GetNPCs(ctx context.Context, in *pb.Empty) (*pb.NPCList
 }
 
 func (s *UniverseServer) StreamUniverseState(stream pb.UniverseService_StreamUniverseStateServer) error {
+
 	s.Log.Info("Started StreamUniverseState")
 	subscribed := false
 	paused := false
 
 	for {
+
 		select {
 		case <-stream.Context().Done():
 			s.Log.Info("StreamUniverseState context cancelled")
@@ -70,48 +72,58 @@ func (s *UniverseServer) StreamUniverseState(stream pb.UniverseService_StreamUni
 			}
 
 			if subscribed && !paused {
-			select {
-			case planets := <-s.Game.planetUpdates:
-				var npcs []*NPC
-				var events []*Event
-				select {
-				case npcs = <-s.Game.npcUpdates:
-				default:
-					npcs = []*NPC{}
-				}
-				select {
-				case events = <-s.Game.eventUpdates:
-				default:
-					events = []*Event{}
-				}
 
-				s.Log.Debug("Sending universe state update: %d planets, %d NPCs, %d events", len(planets), len(npcs), len(events))
+				select {
+				case planets := <-s.Game.planetUpdates:
 
-				planetsProto := make([]*pb.Planet, 0, len(planets))
-				for _, p := range planets {
-					planetsProto = append(planetsProto, planetToProto(p))
+					npcs := s.readNPCUpdates()
+					events := s.readEventUpdates()
+					s.Log.Debug("Sending universe state update: %d planets, %d NPCs, %d events", len(planets), len(npcs), len(events))
+
+					planetsProto := make([]*pb.Planet, 0, len(planets))
+					for _, p := range planets {
+						planetsProto = append(planetsProto, planetToProto(p))
+					}
+					npcsProto := make([]*pb.NPC, 0, len(npcs))
+					for _, n := range npcs {
+						npcsProto = append(npcsProto, npcToProto(n))
+					}
+					eventsProto := make([]*pb.Event, 0, len(events))
+					for _, e := range events {
+						eventsProto = append(eventsProto, eventToProto(e))
+					}
+					msg := &pb.UniverseState{
+						Planets: &pb.PlanetList{Planets: planetsProto},
+						Npcs:    &pb.NPCList{Npcs: npcsProto},
+						Events:  eventsProto,
+					}
+					if err := stream.Send(msg); err != nil {
+						s.Log.Error("Failed to send universe state: %v", err)
+						return err
+					}
+				default:
+					// No planet updates available, continue loop
 				}
-				npcsProto := make([]*pb.NPC, 0, len(npcs))
-				for _, n := range npcs {
-					npcsProto = append(npcsProto, npcToProto(n))
-				}
-				eventsProto := make([]*pb.Event, 0, len(events))
-				for _, e := range events {
-					eventsProto = append(eventsProto, eventToProto(e))
-				}
-				msg := &pb.UniverseState{
-					Planets: &pb.PlanetList{Planets: planetsProto},
-					Npcs:    &pb.NPCList{Npcs: npcsProto},
-					Events:  eventsProto,
-				}
-				if err := stream.Send(msg); err != nil {
-					s.Log.Error("Failed to send universe state: %v", err)
-					return err
-				}
-			default:
-				// No planet updates available, continue loop
 			}
 		}
+	}
+}
+
+func (s *UniverseServer) readNPCUpdates() []*NPC {
+	select {
+	case npcs := <-s.Game.npcUpdates:
+		return npcs
+	default:
+		return []*NPC{}
+	}
+}
+
+func (s *UniverseServer) readEventUpdates() []*Event {
+	select {
+	case events := <-s.Game.eventUpdates:
+		return events
+	default:
+		return []*Event{}
 	}
 }
 
