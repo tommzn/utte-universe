@@ -72,8 +72,18 @@ func (s *UniverseServer) StreamUniverseState(stream pb.UniverseService_StreamUni
 			if subscribed && !paused {
 			select {
 			case planets := <-s.Game.planetUpdates:
-				npcs := <-s.Game.npcUpdates
-				events := <-s.Game.eventUpdates
+				var npcs []*NPC
+				var events []*Event
+				select {
+				case npcs = <-s.Game.npcUpdates:
+				default:
+					npcs = []*NPC{}
+				}
+				select {
+				case events = <-s.Game.eventUpdates:
+				default:
+					events = []*Event{}
+				}
 
 				s.Log.Debug("Sending universe state update: %d planets, %d NPCs, %d events", len(planets), len(npcs), len(events))
 
@@ -99,7 +109,7 @@ func (s *UniverseServer) StreamUniverseState(stream pb.UniverseService_StreamUni
 					return err
 				}
 			default:
-				// No updates available, continue loop
+				// No planet updates available, continue loop
 			}
 		}
 	}
