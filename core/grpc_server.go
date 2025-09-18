@@ -41,30 +41,35 @@ func (s *UniverseServer) StreamUniverseState(stream pb.UniverseService_StreamUni
 	paused := false
 
 	for {
-		cmd, err := stream.Recv()
-		if err != nil {
-			s.Log.Error("StreamUniverseState closed or errored: %v", err)
-			return err
-		}
+		select {
+		case <-stream.Context().Done():
+			s.Log.Info("StreamUniverseState context cancelled")
+			return stream.Context().Err()
+		default:
+			cmd, err := stream.Recv()
+			if err != nil {
+				s.Log.Error("StreamUniverseState closed or errored: %v", err)
+				return err
+			}
 
-		s.Log.Debug("Received client command: %v", cmd.Type)
-		switch cmd.Type {
-		case pb.ClientCommand_SUBSCRIBE:
-			subscribed = true
-			paused = false
-			s.Log.Info("Client subscribed to universe state stream")
-		case pb.ClientCommand_PAUSE:
-			paused = true
-			s.Log.Info("Client paused universe state stream")
-		case pb.ClientCommand_RESUME:
-			paused = false
-			s.Log.Info("Client resumed universe state stream")
-		case pb.ClientCommand_UNSUBSCRIBE:
-			subscribed = false
-			s.Log.Info("Client unsubscribed from universe state stream")
-		}
+			s.Log.Debug("Received client command: %v", cmd.Type)
+			switch cmd.Type {
+			case pb.ClientCommand_SUBSCRIBE:
+				subscribed = true
+				paused = false
+				s.Log.Info("Client subscribed to universe state stream")
+			case pb.ClientCommand_PAUSE:
+				paused = true
+				s.Log.Info("Client paused universe state stream")
+			case pb.ClientCommand_RESUME:
+				paused = false
+				s.Log.Info("Client resumed universe state stream")
+			case pb.ClientCommand_UNSUBSCRIBE:
+				subscribed = false
+				s.Log.Info("Client unsubscribed from universe state stream")
+			}
 
-		if subscribed && !paused {
+			if subscribed && !paused {
 			select {
 			case planets := <-s.Game.planetUpdates:
 				npcs := <-s.Game.npcUpdates
