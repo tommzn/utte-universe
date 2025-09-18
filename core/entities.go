@@ -1,7 +1,11 @@
+// Package core provides the main entities and types for the UTTE Universe simulation.
+// It defines planets, buildings, resources, NPCs, trade actions, and events.
+
 package core
 
 import "time"
 
+// PlanetType represents the type of a planet in the universe.
 type PlanetType int
 
 const (
@@ -26,6 +30,7 @@ func (pt PlanetType) String() string {
 	}
 }
 
+// BuildingType represents the type of a building.
 type BuildingType int
 
 const (
@@ -50,6 +55,7 @@ func (b BuildingType) String() string {
 	}
 }
 
+// BuildingTypeFromString converts a string to a BuildingType.
 func BuildingTypeFromString(s string) BuildingType {
 	switch s {
 	case "Mine":
@@ -65,6 +71,7 @@ func BuildingTypeFromString(s string) BuildingType {
 	}
 }
 
+// Building represents a building on a planet, including its type, level, production, modifiers, and build cost.
 type Building struct {
 	Type       BuildingType
 	Level      int
@@ -73,6 +80,7 @@ type Building struct {
 	BuildCost  map[ResourceType]int     // cost to build/upgrade
 }
 
+// ResourceType represents a type of resource in the universe.
 type ResourceType int
 
 const (
@@ -95,6 +103,7 @@ func (r ResourceType) String() string {
 	}
 }
 
+// ResourceTypeFromString converts a string to a ResourceType.
 func ResourceTypeFromString(s string) ResourceType {
 	switch s {
 	case "Iron":
@@ -108,6 +117,7 @@ func ResourceTypeFromString(s string) ResourceType {
 	}
 }
 
+// Planet represents a planet in the universe, including its type, resources, modifiers, buildings, and owner.
 type Planet struct {
 	Name      string                   `json:"name"`
 	Type      PlanetType               `json:"type"`
@@ -117,6 +127,7 @@ type Planet struct {
 	Owner     *NPC                     `json:"owner"`
 }
 
+// NPC represents a non-player character, including trading offers, credits, cargo, and cooldowns.
 type NPC struct {
 	Name                 string               `json:"name"`
 	Offer                map[ResourceType]int `json:"offer"`
@@ -126,6 +137,7 @@ type NPC struct {
 	ColonizationCooldown time.Time            `json:"colonizationCooldown"`
 }
 
+// TradeAction represents a trade action between an NPC and a planet.
 type TradeAction struct {
 	NPCName    string
 	PlanetName string
@@ -133,6 +145,7 @@ type TradeAction struct {
 	Amount     int
 }
 
+// EventTarget specifies the target type for an event (planet or building).
 type EventTarget int
 
 const (
@@ -140,6 +153,7 @@ const (
 	BuildingTarget
 )
 
+// Event represents a game event, which can target a planet or building and apply resource boosts for a duration.
 type Event struct {
 	Name           string
 	Target         EventTarget
