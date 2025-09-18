@@ -1,1 +1,74 @@
-// game.proto placeholder
+syntax = "proto3";
+
+package proto;
+
+option go_package = "core/proto;proto";
+
+service UniverseService {
+  rpc GetPlanets (Empty) returns (PlanetList);
+  rpc GetNPCs (Empty) returns (NPCList);
+  rpc StreamUniverseState (stream ClientCommand) returns (stream UniverseState);
+}
+
+message Empty {}
+
+message PlanetList {
+  repeated Planet planets = 1;
+}
+
+message NPCList {
+  repeated NPC npcs = 1;
+}
+
+message Planet {
+  string name = 1;
+  string type = 2;
+  map<string, int32> resources = 3;
+  map<string, float> modifiers = 4;
+  repeated Building buildings = 5;
+  NPC owner = 6;
+}
+
+message Building {
+  string type = 1;
+  int32 level = 2;
+  map<string, int32> production = 3;
+  map<string, float> modifiers = 4;
+  map<string, int32> buildCost = 5;
+}
+
+message NPC {
+  string name = 1;
+  map<string, int32> offer = 2;
+  int32 credits = 3;
+  map<string, int32> cargo = 4;
+  int32 maxCargo = 5;
+  string colonizationCooldown = 6;
+}
+
+message UniverseState {
+  PlanetList planets = 1;
+  NPCList npcs = 2;
+  repeated Event events = 3;
+}
+
+message Event {
+  string name = 1;
+  int32 target = 2;
+  string targetPlanet = 3;
+  string targetBuilding = 4;
+  map<string, float> resourceBoost = 5;
+  int32 duration = 6;
+  int32 remainingTicks = 7;
+}
+
+message ClientCommand {
+  enum CommandType {
+    SUBSCRIBE = 0;
+    PAUSE = 1;
+    RESUME = 2;
+    UNSUBSCRIBE = 3;
+  }
+  CommandType type = 1;
+  string payload = 2;
+}

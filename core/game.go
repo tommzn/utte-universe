@@ -7,23 +7,32 @@ import (
 )
 
 type Game struct {
-	config       Config
-	random       Random
+	mu sync.Mutex
+
+	config Config
+	random Random
+	log    Log
+
 	Planets      []*Planet
 	NPCs         []*NPC
 	ActiveEvents []*Event
-	log          Log
-	mu           sync.Mutex
+
+	planetUpdates chan []*Planet
+	npcUpdates    chan []*NPC
+	eventUpdates  chan []*Event
 }
 
 func NewGameService(config Config, random Random, log Log, planets []*Planet, npcs []*NPC) *Game {
 	return &Game{
-		config:       config,
-		random:       random,
-		Planets:      planets,
-		NPCs:         npcs,
-		log:          log,
-		ActiveEvents: []*Event{},
+		config:        config,
+		random:        random,
+		Planets:       planets,
+		NPCs:          npcs,
+		log:           log,
+		ActiveEvents:  []*Event{},
+		planetUpdates: make(chan []*Planet, 10),
+		npcUpdates:    make(chan []*NPC, 10),
+		eventUpdates:  make(chan []*Event, 10),
 	}
 }
 
@@ -46,9 +55,26 @@ func (g *Game) GameLoop(ctx context.Context) {
 			for _, npc := range g.NPCs {
 				RunNPCLogic(npc, g.Planets, g.random, g.log)
 			}
+
+			g.sendUpdates()
 			g.log.Debug("Game tick completed.")
 			g.mu.Unlock()
 		}
+	}
+}
+
+func (g *Game) sendUpdates() {
+	select {
+	case g.planetUpdates <- g.Planets:
+	default:
+	}
+	select {
+	case g.npcUpdates <- g.NPCs:
+	default:
+	}
+	select {
+	case g.eventUpdates <- g.ActiveEvents:
+	default:
 	}
 }
 
