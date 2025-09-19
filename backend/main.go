@@ -7,6 +7,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/tommzn/go-config"
 	_ "github.com/tommzn/go-config"
 	"github.com/tommzn/go-log"
 	"github.com/tommzn/utte-universe/core"
@@ -15,6 +16,8 @@ import (
 func main() {
 
 	conf, _, logger, ctx := bootstrap()
+	httpPort := conf.Get("server.ports.http", config.AsStringPtr("8080"))
+	grpcPort := conf.Get("server.ports.grpc", config.AsStringPtr("8081"))
 	defer logger.Flush()
 
 	gameConfig := &core.Config{}
@@ -36,8 +39,22 @@ func main() {
 		game.GameLoop(gameCtx)
 	}()
 
-	healthServer := NewHealthServer(":8080", logger)
+	healthServer := NewHealthServer(":"+*httpPort, logger)
 	go healthServer.Start()
+
+	// Graceful gRPC server setup
+	grpcDone := make(chan struct{})
+	grpcServer, grpcListener, err := core.NewGRPCServer(game, ":"+*grpcPort, gameLogger)
+	if err != nil {
+		logger.Error("Failed to start gRPC server: %v", err)
+		os.Exit(1)
+	}
+	go func() {
+		if err := grpcServer.Serve(grpcListener); err != nil {
+			logger.Error("gRPC server error: %v", err)
+		}
+		close(grpcDone)
+	}()
 
 	// Handle OS signals
 	quit := make(chan os.Signal, 1)
@@ -49,6 +66,10 @@ func main() {
 	cancel()
 
 	healthServer.Shutdown(5 * time.Second)
+
+	// Graceful shutdown for gRPC server
+	grpcServer.GracefulStop()
+	<-grpcDone
 
 	logger.Info("Exited cleanly")
 }

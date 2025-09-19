@@ -6,7 +6,7 @@ require (
 	github.com/tommzn/go-config v1.3.0
 	github.com/tommzn/go-log v1.2.5
 	github.com/tommzn/go-secrets v1.1.4
-	github.com/tommzn/utte-universe/core v0.0.1
+	github.com/tommzn/utte-universe/core v0.0.4
 )
 
 require (
@@ -42,7 +42,11 @@ require (
 	github.com/spf13/viper v1.20.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tommzn/go-utils v1.0.6 // indirect
+	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
+	google.golang.org/grpc v1.75.1 // indirect
+	google.golang.org/protobuf v1.36.9 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
