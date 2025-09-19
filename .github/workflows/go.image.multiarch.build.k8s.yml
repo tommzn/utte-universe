@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   go-multi-arch-image-build:
-    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.v2.yml@v1.0.103
+    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.v2.yml@v1.0.104
     with:
       work-directory: './backend'
+      image-suffix: '-backend'
