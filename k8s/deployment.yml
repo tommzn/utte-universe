@@ -1,19 +1,19 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: de-tommzn-utte-universe
+  name: de-tommzn-utte-universe-backend
   namespace: utte
   labels:
-    app: de-tommzn-utte-universe
+    app: de-tommzn-utte-universe-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: de-tommzn-utte-universe
+      app: de-tommzn-utte-universe-backend
   template:
     metadata:
       labels:
-        app: de-tommzn-utte-universe
+        app: de-tommzn-utte-universe-backend
     spec:
       volumes:
         - name: secret-volume
@@ -70,3 +70,19 @@ spec:
             # expects status code 204
       imagePullSecrets:
         - name: ghcr-credentials
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: de-tommzn-utte-universe-backend
+  namespace: utte
+  labels:
+    app: de-tommzn-utte-universe-backend
+spec:
+  selector:
+    app: de-tommzn-utte-universe-backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
