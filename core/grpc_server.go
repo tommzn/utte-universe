@@ -2,11 +2,11 @@ package core
 
 import (
 	"context"
+	"google.golang.org/grpc"
 	"net"
 	"time"
 
 	pb "github.com/tommzn/utte-universe/core/proto"
-	"google.golang.org/grpc"
 )
 
 type UniverseServer struct {
@@ -218,14 +218,15 @@ func eventToProto(e *Event) *pb.Event {
 	}
 }
 
-func StartGRPCServer(game *Game, addr string, log Log) error {
+// NewGRPCServer returns a *grpc.Server and net.Listener for graceful shutdown, or errors.
+func NewGRPCServer(game *Game, addr string, log Log) (*grpc.Server, net.Listener, error) {
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Error("Failed to listen on %s: %v", addr, err)
-		return err
+		return nil, nil, err
 	}
 	grpcServer := grpc.NewServer()
 	pb.RegisterUniverseServiceServer(grpcServer, &UniverseServer{Game: game, Log: log})
 	log.Info("gRPC server started on %s", addr)
-	return grpcServer.Serve(lis)
+	return grpcServer, lis, nil
 }

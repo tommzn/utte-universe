@@ -169,7 +169,7 @@ func (suite *UniverseServerTestSuite) TestStartGRPCServerError() {
 	game := &Game{}
 	log := &mockLog{}
 	// Use an invalid address to force error
-	err := StartGRPCServer(game, "invalid_addr", log)
+	_, _, err := NewGRPCServer(game, "invalid_addr", log)
 	suite.Error(err)
 }
 
