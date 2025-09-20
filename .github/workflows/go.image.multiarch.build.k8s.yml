@@ -9,8 +9,13 @@ permissions:
   packages: write
 
 jobs:
-  go-multi-arch-image-build:
+  backend-image-build:
     uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.v2.yml@v1.0.104
     with:
       work-directory: './backend'
       image-suffix: '-backend'
+  ui-backend-image-build:
+    uses: tommzn/github-ci/.github/workflows/go.image.multiarch.build.v2.yml@v1.0.104
+    with:
+      work-directory: './ui-backend'
+      image-suffix: '-ui-backend'
