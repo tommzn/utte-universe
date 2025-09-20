@@ -2,9 +2,10 @@ package core
 
 import (
 	"context"
-	"google.golang.org/grpc"
 	"net"
 	"time"
+
+	"google.golang.org/grpc"
 
 	pb "github.com/tommzn/utte-universe/core/proto"
 )
@@ -72,6 +73,8 @@ func (s *UniverseServer) StreamUniverseState(stream pb.UniverseService_StreamUni
 			}
 
 			if subscribed && !paused {
+
+				s.Log.Debug("Waiting for planet updates...")
 
 				select {
 				case planets := <-s.Game.planetUpdates:

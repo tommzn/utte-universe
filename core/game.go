@@ -65,6 +65,7 @@ func (g *Game) GameLoop(ctx context.Context) {
 }
 
 func (g *Game) sendUpdates() {
+	g.log.Debug("Sending updates...")
 	select {
 	case g.planetUpdates <- g.Planets:
 	default:
