@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: de-tommzn-utte-universe-backend-config
+data:
+  HTTP_PORT: "8080"
+  GRPC_PORT: "8081"
+  GO_CONFIG_S3_BUCKET: "tsl.app.config"
+  GO_CONFIG_S3_KEY: "prod/k8s/utte-universe/backend/config.yml"
+  AWS_REGION: "eu-central-1"
+
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: de-tommzn-utte-universe-backend
+  namespace: utte
+  labels:
+    app: de-tommzn-utte-universe-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: de-tommzn-utte-universe-backend
+  template:
+    metadata:
+      labels:
+        app: de-tommzn-utte-universe-backend
+    spec:
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: de-tommzn-secrets-utte
+      containers:
+        - name: de-tommzn-utte-universe
+          image: docker pull ghcr.io/tommzn/utte-universe-backend:v0.0.8
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /run/secrets/token
+              readOnly: true
+          imagePullPolicy: Always
+          env:
+            - name: TSL_K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: TSL_K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          envFrom:
+            - configMapRef:
+                name: de-tommzn-utte-universe-backend-config
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 8081
+              name: grpc
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              httpHeaders:
+                - name: Accept
+                  value: application/json
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+            # expects status code 204
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              httpHeaders:
+                - name: Accept
+                  value: application/json
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+            # expects status code 204
+      imagePullSecrets:
+        - name: ghcr-credentials
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: utte-universe-backend
+  namespace: utte
+  labels:
+    app: utte-universe-backend
+spec:
+  selector:
+    app: de-tommzn-utte-universe-backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      name: http
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+      name: grpc
+  type: ClusterIP

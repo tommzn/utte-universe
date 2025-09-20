@@ -1,19 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: de-tommzn-utte-universe-ui-backend-config
+data:
+  HTTP_PORT: "8080"
+  GAME_BACKEND_ADDR: "utte-universe-backend:8081"
+  GO_CONFIG_S3_BUCKET: "tsl.app.config"
+  GO_CONFIG_S3_KEY: "prod/k8s/utte-universe/ui-backend/config.yml"
+  AWS_REGION: "eu-central-1"
+
+---
+
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: de-tommzn-utte-universe-backend
+  name: de-tommzn-utte-universe-ui-backend
   namespace: utte
   labels:
-    app: de-tommzn-utte-universe-backend
+    app: de-tommzn-utte-universe-ui-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: de-tommzn-utte-universe-backend
+      app: de-tommzn-utte-universe-ui-backend
   template:
     metadata:
       labels:
-        app: de-tommzn-utte-universe-backend
+        app: de-tommzn-utte-universe-ui-backend
     spec:
       volumes:
         - name: secret-volume
@@ -21,7 +34,7 @@ spec:
             secretName: de-tommzn-secrets-utte
       containers:
         - name: de-tommzn-utte-universe
-          image: ghcr.io/tommzn/utte-universe:v0.0.5
+          image: docker pull ghcr.io/tommzn/utte-universe-ui-backend:v0.0.8
           volumeMounts:
             - name: secret-volume
               mountPath: /run/secrets/token
@@ -36,12 +49,12 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: GO_CONFIG_S3_BUCKET
-              value: tsl.app.config
-            - name: GO_CONFIG_S3_KEY
-              value: prod/k8s/utte-universe/config.yml
-            - name: AWS_REGION
-              value: eu-central-1
+          envFrom:
+            - configMapRef:
+                name: de-tommzn-utte-universe-ui-backend-config
+          ports:
+            - containerPort: 8080
+              name: http
           startupProbe:
             httpGet:
               path: /healthz
@@ -74,15 +87,18 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: de-tommzn-utte-universe-backend
+  name: utte-universe-ui-backend
   namespace: utte
   labels:
-    app: de-tommzn-utte-universe-backend
+    app: utte-universe-ui-backend
 spec:
   selector:
-    app: de-tommzn-utte-universe-backend
+    app: de-tommzn-utte-universe-ui-backend
   ports:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-  type: ClusterIP
+      name: http
+      nodePort: 30080
+  #type: ClusterIP
+  type: NodePort
