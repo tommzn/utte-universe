@@ -96,7 +96,7 @@ func (u *UIBBackend) handleWebsocket(w http.ResponseWriter, r *http.Request) {
 		}
 		u.logger.Debug("Sending update to frontend")
 		if err := ws.WriteJSON(update); err != nil {
-			u.logger.Errorf("WebSocket write error: %v", err)
+			u.logger.Errorf("WebSocket write error: %v, content: %+v", err, update)
 			return
 		}
 	}
