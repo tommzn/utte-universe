@@ -94,8 +94,8 @@ github.com/tommzn/go-secrets v1.1.4 h1:TZy0VIfLnLad4jMPD6TfY8r8y8HVWH6mm2MIa8dyT
 github.com/tommzn/go-secrets v1.1.4/go.mod h1:SV2kl1YMLQU5HHFzq6M897id0SxJm5XijkNHMooHIFo=
 github.com/tommzn/go-utils v1.0.6 h1:wNT+AkTqRB+z+teCx328LcAXk/EN8R8j819x1452PWg=
 github.com/tommzn/go-utils v1.0.6/go.mod h1:8TYiDPF7MzHZSw2KY7lDV+ZDOR8S2k/9+kLkX7geUv4=
-github.com/tommzn/utte-universe/core v0.0.5 h1:3vu8fBavwOSz1/8xFs9RZ9sxIVKiMGpKt97j/7u05sM=
-github.com/tommzn/utte-universe/core v0.0.5/go.mod h1:GX00ida1UyDCTyKuS80ymAzwg15U+mgIdqBXW/6DhoA=
+github.com/tommzn/utte-universe/core v0.0.6 h1:YZJnvJPCctvYgy4lwutVbpa0tnTbnW4CttPYhaQSu+w=
+github.com/tommzn/utte-universe/core v0.0.6/go.mod h1:GX00ida1UyDCTyKuS80ymAzwg15U+mgIdqBXW/6DhoA=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/otel v1.37.0 h1:9zhNfelUvx0KBfu/gb+ZgeAfAgtWrfHJZcAqFC228wQ=

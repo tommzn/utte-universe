@@ -7,7 +7,7 @@ require (
 	github.com/tommzn/go-config v1.3.0
 	github.com/tommzn/go-log v1.2.5
 	github.com/tommzn/go-secrets v1.1.4
-	github.com/tommzn/utte-universe/core v0.0.5
+	github.com/tommzn/utte-universe/core v0.0.6
 	google.golang.org/grpc v1.75.1
 )
 
