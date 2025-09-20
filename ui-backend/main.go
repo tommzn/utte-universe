@@ -29,10 +29,11 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", ui.handleWebsocket)
 
-	httpPort := os.Getenv("HTTP_PORT")
-	healthServer := NewHealthServer(":"+httpPort, logger)
+	healthPort := os.Getenv("HEALTH_CHECK_PORT")
+	healthServer := NewHealthServer(":"+healthPort, logger)
 	go healthServer.Start()
 
+	httpPort := os.Getenv("HTTP_PORT")
 	srv := &http.Server{Addr: ":" + httpPort, Handler: mux}
 	go func() {
 		logger.Infof("UI Backend listening on %s", srv.Addr)
