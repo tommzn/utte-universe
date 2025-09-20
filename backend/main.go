@@ -7,7 +7,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/tommzn/go-config"
 	_ "github.com/tommzn/go-config"
 	"github.com/tommzn/go-log"
 	"github.com/tommzn/utte-universe/core"
@@ -39,12 +38,12 @@ func main() {
 		game.GameLoop(gameCtx)
 	}()
 
-	healthServer := NewHealthServer(":"+*httpPort, logger)
+	healthServer := NewHealthServer(":"+httpPort, logger)
 	go healthServer.Start()
 
 	// Graceful gRPC server setup
 	grpcDone := make(chan struct{})
-	grpcServer, grpcListener, err := core.NewGRPCServer(game, ":"+*grpcPort, gameLogger)
+	grpcServer, grpcListener, err := core.NewGRPCServer(game, ":"+grpcPort, gameLogger)
 	if err != nil {
 		logger.Error("Failed to start gRPC server: %v", err)
 		os.Exit(1)
