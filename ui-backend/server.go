@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/tommzn/go-log"
@@ -30,6 +31,19 @@ func NewUIBackend(addr string, logger log.Logger) (*UIBBackend, error) {
 	return &UIBBackend{gameClient: client, logger: logger}, nil
 }
 
+func (u *UIBBackend) flushLogsPeriodically(ctx context.Context) {
+	ticker := time.NewTicker(time.Minute)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			u.logger.Flush()
+		}
+	}
+}
+
 func (u *UIBBackend) handleWebsocket(w http.ResponseWriter, r *http.Request) {
 
 	ws, err := upgrader.Upgrade(w, r, nil)
@@ -43,6 +57,8 @@ func (u *UIBBackend) handleWebsocket(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	go u.flushLogsPeriodically(ctx)
 
 	stream, err := u.gameClient.StreamUniverseState(ctx)
 	if err != nil {
