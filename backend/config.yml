@@ -2,11 +2,6 @@ log:
   loglevel: error
   shipper: logzio
 
-server:
-  ports:
-    http: 8080
-    grpc: 9090
-
 tick_duration: 2s
 universe_seed:
   number_of_planets:

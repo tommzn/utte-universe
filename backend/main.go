@@ -16,8 +16,8 @@ import (
 func main() {
 
 	conf, _, logger, ctx := bootstrap()
-	httpPort := conf.Get("server.ports.http", config.AsStringPtr("8080"))
-	grpcPort := conf.Get("server.ports.grpc", config.AsStringPtr("8081"))
+	httpPort := os.Getenv("HTTP_PORT")
+	grpcPort := os.Getenv("GRPC_PORT")
 	defer logger.Flush()
 
 	gameConfig := &core.Config{}

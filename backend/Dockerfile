@@ -28,7 +28,7 @@ FROM --platform=linux/${TARGETARCH:-amd64} gcr.io/distroless/static:nonroot
 ARG TARGETOS
 ARG TARGETARCH
 
-LABEL org.opencontainers.image.source=https://github.com/tommzn/utte-universe-backend
+LABEL org.opencontainers.image.source=https://github.com/tommzn/utte-universe
 
 WORKDIR /go
 
