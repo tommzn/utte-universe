@@ -1,3 +1,9 @@
 /backend/backend
 /k8s/generate_ghcr_secret.local.sh
 /k8s/secrets.local.yml
+/.idea/copilot.data.migration.agent.xml
+/.idea/copilot.data.migration.edit.xml
+/.idea/copilotDiffState.xml
+/.idea/vcs.xml
+/.idea/modules.xml
+/.idea/utte-universe.iml
