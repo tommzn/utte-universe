@@ -66,17 +66,26 @@ func (g *Game) GameLoop(ctx context.Context) {
 
 func (g *Game) sendUpdates() {
 	g.log.Debug("Sending updates...")
+	g.log.Debug("Planet updates: %d planets", len(g.Planets))
+	g.log.Debug("NPC updates: %d NPCs", len(g.NPCs))
+	g.log.Debug("Event updates: %d events", len(g.ActiveEvents))
 	select {
 	case g.planetUpdates <- g.Planets:
+		g.log.Debug("Planet updates sent.")
 	default:
+		g.log.Debug("Planet updates channel full, skipping send.")
 	}
 	select {
 	case g.npcUpdates <- g.NPCs:
+		g.log.Debug("NPC updates sent.")
 	default:
+		g.log.Debug("NPC updates channel full, skipping send.")
 	}
 	select {
 	case g.eventUpdates <- g.ActiveEvents:
+		g.log.Debug("Event updates sent.")
 	default:
+		g.log.Debug("Event updates channel full, skipping send.")
 	}
 }
 
