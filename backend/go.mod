@@ -6,7 +6,7 @@ require (
 	github.com/tommzn/go-config v1.3.0
 	github.com/tommzn/go-log v1.2.5
 	github.com/tommzn/go-secrets v1.1.4
-	github.com/tommzn/utte-universe/core v0.0.4
+	github.com/tommzn/utte-universe/core v0.0.5
 )
 
 require (
