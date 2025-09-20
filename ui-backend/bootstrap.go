@@ -34,6 +34,7 @@ func loadConfig() config.Config {
 
 func newSecretsManager() secrets.SecretsManager {
 	secretsManager := secrets.NewDockerecretsManager("/run/secrets/token")
+	secrets.ExportToEnvironment([]string{"AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"}, secretsManager)
 	return secretsManager
 }
 
