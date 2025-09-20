@@ -59,6 +59,7 @@ func (g *Game) GameLoop(ctx context.Context) {
 			g.sendUpdates()
 			g.log.Debug("Game tick completed.")
 			g.mu.Unlock()
+			g.log.Flush()
 		}
 	}
 }

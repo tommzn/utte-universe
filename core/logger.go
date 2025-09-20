@@ -23,3 +23,7 @@ func (l *CustomLogger) Info(message string, v ...interface{}) {
 func (l *CustomLogger) Debug(message string, v ...interface{}) {
 	l.log.Debugf(message, v...)
 }
+
+func (l *CustomLogger) Flush() {
+	l.log.Flush()
+}

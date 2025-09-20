@@ -11,4 +11,5 @@ type Log interface {
 	Error(message string, v ...interface{})
 	Info(message string, v ...interface{})
 	Debug(message string, v ...interface{})
+	Flush()
 }

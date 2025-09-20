@@ -52,6 +52,10 @@ func (l *mockLog) Debug(format string, args ...interface{}) {
 	l.debugs = append(l.debugs, fmt.Sprintf(format, args...))
 }
 
+func (l *mockLog) Flush() {
+	// No-op for mock, but present to satisfy Log interface.
+}
+
 func loadConfigForTest(fileName *string) config.Config {
 
 	configFile := "fixtures/testconfig.yml"
