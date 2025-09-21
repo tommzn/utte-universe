@@ -310,7 +310,7 @@ func (suite *UniverseServerTestSuite) TestStreamUniverseStateSubscribePauseResum
 	go func() {
 		err := server.StreamUniverseState(stream)
 		// Only treat error as failure if it's not "stream closed"
-		if err != nil && err.Error() != "stream closed" {
+		if err != nil && err.Error() != "stream closed" && err != nil {
 			done <- err
 		} else {
 			done <- nil
@@ -321,7 +321,7 @@ func (suite *UniverseServerTestSuite) TestStreamUniverseStateSubscribePauseResum
 	err := <-done
 	suite.True(stream.closed)
 	suite.NoError(err)
-	// Only one update should be sent (on SUBSCRIBE and RESUME, but only one set of updates in channel)
+	// Only one update should be sent (on SUBSCRIBE, since only one set of updates in channel)
 	suite.GreaterOrEqual(stream.sendCalls, 1)
 	suite.Equal("Earth", stream.sentStates[0].Planets.Planets[0].Name)
 	suite.Equal("NPC1", stream.sentStates[0].Npcs.Npcs[0].Name)

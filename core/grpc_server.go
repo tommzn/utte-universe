@@ -43,73 +43,90 @@ func (s *UniverseServer) StreamUniverseState(stream pb.UniverseService_StreamUni
 	paused := false
 
 	for {
+		// If subscribed and not paused, stream updates as they arrive.
+		if subscribed && !paused {
+			select {
+			case <-stream.Context().Done():
+				s.Log.Info("StreamUniverseState context cancelled")
+				return stream.Context().Err()
+			case planets := <-s.Game.planetUpdates:
+				npcs := s.readNPCUpdates()
+				events := s.readEventUpdates()
+				s.Log.Debug("Sending universe state update: %d planets, %d NPCs, %d events", len(planets), len(npcs), len(events))
 
-		select {
-		case <-stream.Context().Done():
-			s.Log.Info("StreamUniverseState context cancelled")
-			return stream.Context().Err()
-		default:
+				planetsProto := make([]*pb.Planet, 0, len(planets))
+				for _, p := range planets {
+					planetsProto = append(planetsProto, planetToProto(p))
+				}
+				npcsProto := make([]*pb.NPC, 0, len(npcs))
+				for _, n := range npcs {
+					npcsProto = append(npcsProto, npcToProto(n))
+				}
+				eventsProto := make([]*pb.Event, 0, len(events))
+				for _, e := range events {
+					eventsProto = append(eventsProto, eventToProto(e))
+				}
+				msg := &pb.UniverseState{
+					Planets: &pb.PlanetList{Planets: planetsProto},
+					Npcs:    &pb.NPCList{Npcs: npcsProto},
+					Events:  eventsProto,
+				}
+				if err := stream.Send(msg); err != nil {
+					s.Log.Error("Failed to send universe state: %v", err)
+					return err
+				}
+			case cmd := <-receiveCommand(stream):
+				if cmd == nil {
+					s.Log.Info("StreamUniverseState closed by client")
+					return nil
+				}
+				subscribed, paused = handleClientCommand(cmd, s.Log, subscribed, paused)
+			}
+		} else {
+			// Not subscribed or paused, wait for client command.
 			cmd, err := stream.Recv()
 			if err != nil {
 				s.Log.Error("StreamUniverseState closed or errored: %v", err)
 				return err
 			}
-
-			s.Log.Debug("Received client command: %v", cmd.Type)
-			switch cmd.Type {
-			case pb.ClientCommand_SUBSCRIBE:
-				subscribed = true
-				paused = false
-				s.Log.Info("Client subscribed to universe state stream")
-			case pb.ClientCommand_PAUSE:
-				paused = true
-				s.Log.Info("Client paused universe state stream")
-			case pb.ClientCommand_RESUME:
-				paused = false
-				s.Log.Info("Client resumed universe state stream")
-			case pb.ClientCommand_UNSUBSCRIBE:
-				subscribed = false
-				s.Log.Info("Client unsubscribed from universe state stream")
-			}
-
-			if subscribed && !paused {
-
-				s.Log.Debug("Waiting for planet updates...")
-
-				select {
-				case planets := <-s.Game.planetUpdates:
-
-					npcs := s.readNPCUpdates()
-					events := s.readEventUpdates()
-					s.Log.Debug("Sending universe state update: %d planets, %d NPCs, %d events", len(planets), len(npcs), len(events))
-
-					planetsProto := make([]*pb.Planet, 0, len(planets))
-					for _, p := range planets {
-						planetsProto = append(planetsProto, planetToProto(p))
-					}
-					npcsProto := make([]*pb.NPC, 0, len(npcs))
-					for _, n := range npcs {
-						npcsProto = append(npcsProto, npcToProto(n))
-					}
-					eventsProto := make([]*pb.Event, 0, len(events))
-					for _, e := range events {
-						eventsProto = append(eventsProto, eventToProto(e))
-					}
-					msg := &pb.UniverseState{
-						Planets: &pb.PlanetList{Planets: planetsProto},
-						Npcs:    &pb.NPCList{Npcs: npcsProto},
-						Events:  eventsProto,
-					}
-					if err := stream.Send(msg); err != nil {
-						s.Log.Error("Failed to send universe state: %v", err)
-						return err
-					}
-				default:
-					// No planet updates available, continue loop
-				}
-			}
+			subscribed, paused = handleClientCommand(cmd, s.Log, subscribed, paused)
 		}
 	}
+}
+
+// Helper to receive commands in a goroutine and send them to a channel.
+func receiveCommand(stream pb.UniverseService_StreamUniverseStateServer) <-chan *pb.ClientCommand {
+	cmdCh := make(chan *pb.ClientCommand, 1)
+	go func() {
+		cmd, err := stream.Recv()
+		if err != nil {
+			cmdCh <- nil
+			return
+		}
+		cmdCh <- cmd
+	}()
+	return cmdCh
+}
+
+// Helper to handle client commands and update subscription state.
+func handleClientCommand(cmd *pb.ClientCommand, log Log, subscribed, paused bool) (bool, bool) {
+	log.Debug("Received client command: %v", cmd.Type)
+	switch cmd.Type {
+	case pb.ClientCommand_SUBSCRIBE:
+		subscribed = true
+		paused = false
+		log.Info("Client subscribed to universe state stream")
+	case pb.ClientCommand_PAUSE:
+		paused = true
+		log.Info("Client paused universe state stream")
+	case pb.ClientCommand_RESUME:
+		paused = false
+		log.Info("Client resumed universe state stream")
+	case pb.ClientCommand_UNSUBSCRIBE:
+		subscribed = false
+		log.Info("Client unsubscribed from universe state stream")
+	}
+	return subscribed, paused
 }
 
 func (s *UniverseServer) readNPCUpdates() []*NPC {
